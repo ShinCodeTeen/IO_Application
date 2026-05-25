@@ -1,0 +1,75 @@
+﻿<Window x:Class="IO_Application.View.Home"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IO_Application.View"
+        mc:Ignorable="d"
+        Title="Home" Height="500" Width="800"  >
+    <Grid Background="#F0F0f0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+           
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Button Content="Broadcast Search" Style="{StaticResource HomeButton}" Command="{Binding BroadcastSearchCommand}" CommandParameter=""/>
+            <Button Content="Connect" Style="{StaticResource HomeButton}" HorizontalAlignment="Right" Command="{Binding ConnectCommand}" CommandParameter=""/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="IO Motion" Margin="5" Grid.Column="0">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="IP Address" FontWeight="Bold" Margin="50 5"/>
+                        <Line X1="10" Y1="20" X2="10" Y2="0" Stroke="Gray" StrokeThickness="1" Margin="20 0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Status" FontWeight="Bold"  HorizontalAlignment="Right" Margin="0 5 60 5"/>
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding IoPorts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Button Content="{Binding PortName}" Style="{StaticResource HomeIpButton}"  Command="{Binding DataContext.IpSelectCommand, 
+                  RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                    <Border Style="{StaticResource StatusBorder}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                   
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Servo Motion" Margin="5" Grid.Column="1">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="IP Address" FontWeight="Bold" Margin="20 5"/>
+                        <Line X1="10" Y1="20" X2="10" Y2="0" Stroke="Gray" StrokeThickness="1" Margin="20 0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Status" FontWeight="Bold"  HorizontalAlignment="Right" Margin="0 5 50 5"/>
+                    </Grid>
+                
+                    <ScrollViewer  Height="350">
+                        <ItemsControl ItemsSource="{Binding ServoPorts}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Button Content="{Binding PortName}" Style="{StaticResource HomeIpButton}" Command="{Binding DataContext.IpSelectCommand, 
+                                             RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                    <Border Style="{StaticResource StatusBorder}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</Window>

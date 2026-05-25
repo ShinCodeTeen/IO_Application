@@ -1,0 +1,279 @@
+﻿<Window x:Class="IO_Application.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:IO_Application"
+        mc:Ignorable="d"
+        Title="IO Controler" Height="720" Width="800">
+    <Grid Height="700" Background="#F1F1F1"  >
+
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top" >
+
+            <Grid>
+                <Button Content="Connect" Style="{StaticResource HomeButton}" Command="{Binding ConnectCommand}" CommandParameter="" />
+                <Button Content="Disconnect" Style="{StaticResource HomeButton}" HorizontalAlignment="Right" Command="{Binding DisconnectCommand}" CommandParameter="" />
+            </Grid>
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" >
+
+                    <TextBlock Text="Connection Status: " FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ConnectStatus}" FontSize="16" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" >
+
+                    <TextBlock Text="Data Status: " FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding DataStatus}" FontSize="16" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" >
+
+                    <TextBlock Text="Command Status: " FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding CommandStatus}" FontSize="16" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" >
+
+                    <TextBlock Text="Servo Status: " FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ServoStatus}" FontSize="16" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+            </Grid>
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="*"/>
+
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+
+                    <Button Style="{StaticResource IPControlButton}" Content="192.168.0.1" Height="40" Width="150" />
+                    <Border Height="40" Width="40" Background="#FAFAFAFA">
+                        <TextBlock Text="in" FontSize="16" FontWeight="SemiBold"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="23*"/>
+                        <RowDefinition Height="2*"/>
+                    </Grid.RowDefinitions>
+                    <ItemsControl Name="InputItemsControl" ItemsSource="{Binding InputItems}" Grid.RowSpan="2">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" ItemHeight="34" ItemWidth="34"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource InputButton}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </Grid>
+
+            </Grid>
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="*"/>
+
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+
+                    <Button Style="{StaticResource IPControlButton}" Content="192.168.0.2" Height="40" Width="150" />
+                    <Border Height="40" Width="40" Background="#FAFAFAFA">
+                        <TextBlock Text="out" FontSize="16" FontWeight="SemiBold"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <ItemsControl Name="OutputItemsControl" ItemsSource="{Binding OutputItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" ItemHeight="34" ItemWidth="34"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource OutputButton}" Command="{Binding DataContext.ToggleOutputCommand, 
+                              RelativeSource={RelativeSource AncestorType=ItemsControl}}"  CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </Grid>
+
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Position Status" Margin="10" FontSize="15">
+
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="Cmd Pos" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding CmdPos}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Actual Pos" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding ActualPos}"/>
+                            </Grid>
+
+                        </StackPanel>
+
+                    </GroupBox>
+                    <GroupBox Header="Jog Move" Margin="10,10,10,10" Grid.Row="1" FontSize="15" Grid.ColumnSpan="3" >
+
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="Max Speed" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding MaxSpeed}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Accel/Decel Time" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding AccelDecelTime}"/>
+                            </Grid>
+                            <Grid Margin="30 5">
+                                <Button Content="- Jog" 
+                                    Style="{StaticResource MoveButton}" 
+                                    HorizontalAlignment="Left"
+                                    Height="40" Margin="7,5,0,0" VerticalAlignment="Top"                                       
+                                    >
+                                    <b:Interaction.Triggers>
+                                        <b:EventTrigger EventName="MouseLeftButtonDown">
+                                            <b:InvokeCommandAction 
+                                                Command="{Binding MinusJogCommand}" CommandParameter="" />
+                                        </b:EventTrigger>
+                                        <b:EventTrigger EventName="MouseLeftButtonUp">
+                                            <b:InvokeCommandAction 
+                                                Command="{Binding JogStopCommand}" CommandParameter="" />
+                                        </b:EventTrigger>
+                                    </b:Interaction.Triggers>
+                                </Button>
+                                <Button Content="+ Jog" 
+                                    Style="{StaticResource MoveButton}" 
+                                    HorizontalAlignment="Right"
+                                    
+                                                                    
+                                >
+                                    <b:Interaction.Triggers>
+                                        <b:EventTrigger EventName="MouseLeftButtonDown">
+                                            <b:InvokeCommandAction 
+                                                  Command="{Binding PlusJogCommand}" CommandParameter="" />
+                                        </b:EventTrigger>
+                                        <b:EventTrigger EventName="MouseLeftButtonUp">
+                                            <b:InvokeCommandAction 
+                                                    Command="{Binding JogStopCommand}" CommandParameter=""/>
+                                        </b:EventTrigger>
+                                    </b:Interaction.Triggers>
+                                </Button>
+
+
+
+
+                            </Grid>
+                            <Grid Margin="30 5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="17*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="- Limit" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Command="{Binding MinusLimitCommand}" CommandParameter="" Margin="7,5,0,5"/>
+                                <Button Content="+ Limit" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Command="{Binding PlusLimitCommand}" CommandParameter="" Grid.ColumnSpan="2" Margin="201,5,0,5"/>
+
+                            </Grid>
+                        </StackPanel>
+
+                    </GroupBox>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <Border Height="90" Width="90" Background="#FAFAFAFA" Margin="10 0" CornerRadius="5">
+                            <TextBlock Text="SEVO" Style="{StaticResource ServoStatusTbl}"/>
+                        </Border>
+                        <WrapPanel Width="300">
+
+                            <Button Content="Servo ON" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Margin="10 5" Command="{Binding ServoOnCommand}" CommandParameter=""/>
+                            <Button Content="Servo OFF" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Margin="10 5" Command="{Binding ServoOffCommand}" CommandParameter=""/>
+                            <Button Grid.Row="3" Content="Reset Alarm" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Margin="10 5" Command="{Binding ResetAlarmCommand}" CommandParameter=""/>
+                            <Button Grid.Row="3" Content="Stop Move" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Margin="10 5" Command="{Binding StopMoveCommand}" CommandParameter=""/>
+                        </WrapPanel>
+                    </StackPanel>
+
+                </Grid>
+                <StackPanel Grid.Column="1">
+                    <GroupBox  Header="Single Move" Margin="10, 5" Grid.Row="0" FontSize="15" Grid.ColumnSpan="3" >
+
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="Cmd Pos" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding SingleMoveCmdPos}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Accel Time" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding AccelTime}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Decel Time" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding DecelTime}"/>
+                            </Grid>
+                            <Button Content="ABS Move" Style="{StaticResource MoveButton}" HorizontalAlignment="Center" Command="{Binding ABSMoveCommand}"/>
+                            <Grid Margin="30 5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40*"/>
+                                    <ColumnDefinition Width="37*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="DEC Move" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Margin="7,5,0,5" Command="{Binding DecMoveCommand}"/>
+                                <Button Content="INC Move" Style="{StaticResource MoveButton}" HorizontalAlignment="Left" Grid.Column="1" Margin="41,5,0,5" Command="{Binding IncMoveCommand}" CommandParameter=""/>
+                            </Grid>
+                        </StackPanel>
+
+                    </GroupBox>
+
+                    <GroupBox Header="Origin" Margin="10 5" FontSize="15">
+
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="Search Speed" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding SearchSpeed}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Speed" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding Speed}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Accel/Decel" VerticalAlignment="Center"/>
+                                <TextBox Style="{StaticResource MoveTxb}" Text="{Binding AccelDecelTime}"/>
+                            </Grid>
+                            <Button Content="Move Origin" Style="{StaticResource MoveButton}" HorizontalAlignment="Center" Command="{Binding MoveOriginCommand}" CommandParameter=""/>
+                        </StackPanel>
+
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>
+    

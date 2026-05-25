@@ -1,0 +1,305 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="Button" x:Key="IPControlButton">
+        <Setter Property="Background" Value="#FDFDFD"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="DemiBold"/>
+        <Setter Property="Padding" Value="10 20"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}"/>
+                    </Border>
+                   
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="InputButton" TargetType="Button">
+        <Setter Property="Background" Value="#FDFDFD"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Width" Value="25"/>
+
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Content" Value="{Binding PinNumber}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                     BorderBrush="{TemplateBinding BorderBrush}"
+                     BorderThickness="{TemplateBinding BorderThickness}"
+                     CornerRadius="6"
+                     Height="{TemplateBinding Height}"
+                     Width="{TemplateBinding Width}"
+                     SnapsToDevicePixels="True">
+
+                        <TextBlock Text="{TemplateBinding Content}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="{TemplateBinding FontSize}"
+                            Foreground="{TemplateBinding Foreground}"
+                            FontFamily="Consolas, Segoe UI" 
+                            TextAlignment="Center"
+                            Margin="0"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers >
+            <DataTrigger Binding="{Binding IsOn}" Value="True">
+                <Setter Property="Background" Value="#11F00A"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="InIoButton" TargetType="Button">
+        <Setter Property="Background" Value="#F6F6F6"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Width" Value="80"/>
+
+        <Setter Property="BorderThickness" Value="0.5 0 0 1"/>
+        <Setter Property="BorderBrush" Value="Gray"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Content" Value="{Binding PinNumber}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border 
+						Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6"
+                        Height="{TemplateBinding Height}"
+                        Width="{TemplateBinding Width}"
+                        SnapsToDevicePixels="True">
+
+                   
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers >
+            <DataTrigger Binding="{Binding IsOn}" Value="True">
+                <Setter Property="Background" Value="#11F00A"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="OutIoButton" TargetType="Button">
+        <Setter Property="Background" Value="#F6F6F6"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Width" Value="80"/>
+
+        <Setter Property="BorderThickness" Value="0.5 0 0 1"/>
+        <Setter Property="BorderBrush" Value="Gray"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Content" Value="{Binding PinNumber}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border 
+				Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      CornerRadius="6"
+                      Height="{TemplateBinding Height}"
+                      Width="{TemplateBinding Width}"
+                      SnapsToDevicePixels="True">
+
+
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers >
+            <DataTrigger Binding="{Binding IsOn}" Value="True">
+                <Setter Property="Background" Value="#F72525"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="OutputButton" TargetType="Button">
+        <Setter Property="Background" Value="#FDFDFD"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Width" Value="25"/>
+     
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Content" Value="{Binding PinNumber}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6"
+                        Height="{TemplateBinding Height}"
+                        Width="{TemplateBinding Width}"
+                        SnapsToDevicePixels="True">
+
+                        <TextBlock Text="{TemplateBinding Content}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="{TemplateBinding FontSize}"
+                               Foreground="{TemplateBinding Foreground}"
+                               FontFamily="Consolas, Segoe UI" 
+                               TextAlignment="Center"
+                               Margin="0"/>
+                </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers >
+            <DataTrigger Binding="{Binding IsOn}" Value="True">
+                <Setter Property="Background" Value="#F72525"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="MoveButton" TargetType="Button">
+        <Setter Property="Background" Value="#FDFDFD"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Margin" Value="7"/>
+        <Setter Property="BorderBrush" Value="Gray"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                         BorderBrush="{TemplateBinding BorderBrush}"
+                         BorderThickness="{TemplateBinding BorderThickness}"
+                         CornerRadius="3"
+                         Width="{TemplateBinding Width}"
+                         Height="{TemplateBinding Height}"
+                         >
+                        <ContentPresenter 
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Content="{TemplateBinding Content}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="HomeIpButton" TargetType="Button">
+        <Setter Property="Background" Value="#FAFAFA"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="20 5 0 0"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Width" Value="160"/>
+        <Setter Property="BorderThickness" Value="0.5"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                         BorderBrush="{TemplateBinding BorderBrush}"
+                         BorderThickness="{TemplateBinding BorderThickness}"
+                         CornerRadius="5"
+                         Width="{TemplateBinding Width}"
+                         Height="{TemplateBinding Height}"
+                         >
+                        <ContentPresenter HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Content="{TemplateBinding Content}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="HomeButton" TargetType="Button">
+        <Setter Property="Background" Value="#FAFAFA"/>
+        <Setter Property="Foreground" Value="#000"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Margin" Value="20 5 20 0"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="BorderThickness" Value="0.5"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                         BorderBrush="{TemplateBinding BorderBrush}"
+                         BorderThickness="{TemplateBinding BorderThickness}"
+                         CornerRadius="5"
+                         Width="{TemplateBinding Width}"
+                         Height="{TemplateBinding Height}"
+                         >
+                        <ContentPresenter HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Content="{TemplateBinding Content}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="ArrowButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="40"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Background" Value="#f3f3f3"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="BorderBrush" Value="Gray"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="Button">
+
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="8">
+
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter 
+                                    Property="Background"
+                                    Value="#fff"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd"
+                                    Property="Background"
+                                    Value="#F8f8f8"/>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+</ResourceDictionary>
