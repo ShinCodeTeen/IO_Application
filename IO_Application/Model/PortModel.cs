@@ -11,7 +11,7 @@ namespace IO_Application.Model
     public class PortModel : BaseViewModel
     {
         public PortModel() {
-            InitPinsNumber();
+            //InitPinsNumber();
         }
         private string _portName;
         public string PortName
@@ -55,23 +55,23 @@ namespace IO_Application.Model
             }
         }
 
-        private ObservableCollection<PinModel> _pins = new();
-        public ObservableCollection<PinModel> Pins
-        {
-            get { return _pins; }
-            set
-            {
-                _pins = value;
-                OnPropertyChanged();
-            }
-        }
-        private void InitPinsNumber()
-        {
-            for (int i = 1; i <= 32; i++)
-            {
-                Pins.Add(new PinModel { PinNumber = i.ToString(), IsOn = false });
-            }
-        }
+        //private ObservableCollection<PinModel> _pins = new();
+        //public ObservableCollection<PinModel> Pins
+        //{
+        //    get { return _pins; }
+        //    set
+        //    {
+        //        _pins = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
+        //private void InitPinsNumber()
+        //{
+        //    for (int i = 1; i <= 32; i++)
+        //    {
+        //        Pins.Add(new PinModel { PinNumber = i.ToString(), IsOn = false });
+        //    }
+        //}
 
     }
 }

@@ -1,5 +1,7 @@
 ﻿using FASTECH;
+using IO_Application.Interfaces;
 using IO_Application.Model;
+using IO_Application.Services;
 using IO_Application.View;
 using System;
 using System.CodeDom;
@@ -17,7 +19,8 @@ namespace IO_Application.ViewModel
     public class HomeViewModel : BaseViewModel
     {
         #region Parameter
-        #region Parameters
+        private CancellationTokenSource _Cts =new();
+        private readonly UserService _userservice;
         private ObservableCollection<PortModel> _ioPorts = new();
         public ObservableCollection<PortModel> IoPorts
         {
@@ -39,12 +42,8 @@ namespace IO_Application.ViewModel
                 OnPropertyChanged(nameof(ServoPorts));
             }
         }
-
-        #endregion
-
         private string baseIoIp = "192.168.1.";
         private string baseServoIp = "192.168.0.";
-
         #endregion
 
         #region Command
@@ -53,9 +52,9 @@ namespace IO_Application.ViewModel
         public ICommand IpSelectCommand { get; }
         #endregion
         public HomeViewModel() {
-
+            _userservice = new UserService();
             BroadcastSearchCommand = new RelayComand<object>(_ => BroadcastSearch());
-            ConnectCommand = new RelayComand<object>(_ => Connect());
+            ConnectCommand = new RelayComand<object>(async _ =>await Connect());
             IpSelectCommand = new RelayComand<PortModel>(p => IpSelect(p));
         }
 
@@ -117,24 +116,23 @@ namespace IO_Application.ViewModel
             {
                 for (int i = 1; i < 25; i++)
                 {
-                    ServoPorts.Add(new PortModel { PortName = "192.168.0.24", PortStatus = 100+i, IBdId =3, Type = "S" });
+                    ServoPorts.Add(new PortModel { PortName = "192.168.0."+i, PortStatus = 0, IBdId =100+i, Type = "S" });
                 }
             }
 
         }
-        public void Connect()
+        
+        public async Task Connect()
         {
             try
             {
                 foreach (var port in IoPorts)
                 {
 
-                    bool connected = EziMOTIONPlusELib.FAS_Connect(IPAddress.Parse(port.PortName), port.IBdId);
+                    //bool connected = EziMOTIONPlusELib.FAS_Connect(IPAddress.Parse(port.PortName), port.IBdId);
+                    bool connected =await _userservice.ConnectIp(port,_Cts.Token);
                     if (connected) port.PortStatus = 1;
                     else port.PortStatus = -1;
-
-
-
                 }
             }
             catch
@@ -146,7 +144,8 @@ namespace IO_Application.ViewModel
             {
                 foreach (var port in ServoPorts)
                 {
-                    bool connected = EziMOTIONPlusELib.FAS_Connect(IPAddress.Parse(port.PortName), port.IBdId);
+                    //bool connected = EziMOTIONPlusELib.FAS_Connect(IPAddress.Parse(port.PortName), port.IBdId);
+                    bool connected =await _userservice.ConnectIp(port, _Cts.Token);
                     if (connected) port.PortStatus = 1;
                     else port.PortStatus = -1;
 
@@ -157,10 +156,6 @@ namespace IO_Application.ViewModel
             {
                 MessageBox.Show($"Failed to connect Servo");
             }
-
-
-
-
         }
         public void IpSelect(PortModel prm)
         {
@@ -168,6 +163,7 @@ namespace IO_Application.ViewModel
             {
                 if (prm.Type == "S")
                 {
+                    
                     ServoMotion servoMotion = new ServoMotion(ServoPorts, prm);
                     servoMotion.Show();
                     

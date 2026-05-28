@@ -1,5 +1,6 @@
 ﻿using FASTECH;
 using IO_Application.Model;
+using IO_Application.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,29 +15,17 @@ using System.Windows.Threading;
 
 namespace IO_Application.ViewModel
 {
-    public interface IpoolingService
-    {
-        public void Start(Action callback, int time);
-        public void Stop();
-    }
+ 
 
-    public class DispartcherPollingService : IpoolingService
-    {
-        DispatcherTimer _timer;
-        public void Start(Action callback, int time)
-        {
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(time) };
-            _timer.Tick += (_, _) => callback();
-            _timer.Start();
-        }
-        public void Stop()
-        {
-            _timer?.Stop();
-        }
-    }
+    
     public class ServoMotionViewModel : BaseViewModel
     {
         #region Parameter
+        private MotionService _motionService;
+        private CancellationTokenSource _cts=new();
+        private Task? _UIRefreshTask;
+        public Action CLoseAction { get; set; }
+
         private string[] status =
         {"Error All","H/W +Limit", "H/W -Limit", "S/W +Limit","S/W -Limit",
          "Push Mode","Push Detect","TQOFF Input1","TQOFF Input2","Err Over Speed",
@@ -75,6 +64,7 @@ namespace IO_Application.ViewModel
         public int ActualPos
         {
             get => _actualPos;
+
             set { _actualPos = value; OnPropertyChanged(); }
         }
         private int _maxSpeed { get; set; } = 5000;
@@ -85,7 +75,7 @@ namespace IO_Application.ViewModel
 
         }
 
-        private int _singleMoveCmdPos { get; set; } = 1000;
+        private int _singleMoveCmdPos { get; set; } = 10000;
         public int SingleMoveCmdPos
         {
             get => _singleMoveCmdPos;
@@ -121,49 +111,18 @@ namespace IO_Application.ViewModel
             get => _accelDecelTime;
             set { _accelDecelTime = value; OnPropertyChanged(); }
         }
-        private bool _isJogging = false;
-        public bool IsJogging
-        {
-            get => _isJogging;
-            set { _isJogging = value; OnPropertyChanged(); }
-        }
-
-        private string _commandStatus;
-        public string CommandStatus
-        {
-            get { return _commandStatus; }
-            set { _commandStatus = value; OnPropertyChanged(); }
-        }
-        private string _dataStatus;
-        public string DataStatus
-        {
-            get { return _dataStatus; }
-            set { _dataStatus = value; OnPropertyChanged(); }
-        }
-        private string _connectStatus;
-        public string ConnectStatus
-        {
-            get { return _connectStatus; }
-            set { _connectStatus = value; OnPropertyChanged(); }
-        }
-        private string _servoStatus;
-        public string ServoStatus
-        {
-            get { return _servoStatus;} 
-            set { _servoStatus = value;OnPropertyChanged(); }
-        }
+   
+    
+ 
         #endregion
         #region Command
         public ICommand ServoOnCommand { get; }
         public ICommand ServoOffCommand { get; }
-
         public ICommand ABSMoveCommand { get; }
         public ICommand MoveOriginCommand { get; }
         public ICommand PlusJogCommand { get; }
         public ICommand MinusJogCommand { get; }
-
         public ICommand JogStopCommand { get; }
-
         public ICommand PlusLimitCommand { get; }
         public ICommand MinusLimitCommand { get; }
         public ICommand DecMoveCommand { get; }
@@ -173,26 +132,23 @@ namespace IO_Application.ViewModel
         public ICommand CloseCommand { get; }
         #endregion
         public ObservableCollection<AxisStatusModel> AxisList { get; set; } = new ObservableCollection<AxisStatusModel>();
-        private IpoolingService pooling = new DispartcherPollingService();
-        public Action CLoseAction { get;set;  }
-
+      
         public ServoMotionViewModel(ObservableCollection<PortModel> SvPorts,PortModel prm) {
             CurrentPort = prm;
             ServoPorts = SvPorts;
-            ConnectStatus = prm.IBdId + "--" +prm.PortName;
-           
-            pooling.Start(LoadUIData, 50);
+         
             AxisStatusModel statusmd = new AxisStatusModel();
             statusmd.InitAxisStatus(AxisList,status);
-            ServoOffCommand = new RelayComand<object>(_ => ServoOff());
-            ServoOnCommand = new RelayComand<object>(_ => ServoOn());
-            PlusJogCommand = new RelayComand<int>(_ => StartJogMove(1));
-            MinusJogCommand = new RelayComand<int>(_ => StartJogMove(0));
-            JogStopCommand = new RelayComand<int>(_ => StopJog());
+            StartReshUI();
+            ServoOffCommand = new RelayComand<object>(async _ =>await EnableServo(0));
+            ServoOnCommand = new RelayComand<object>(async _ => await EnableServo(1));
+            PlusJogCommand = new RelayComand<object>(_ => StartJogMove(1));
+            MinusJogCommand = new RelayComand<object>(_ => StartJogMove(0));
+            JogStopCommand = new RelayComand<object>(_ => StopMove());
             ABSMoveCommand = new RelayComand<object>(_ => ABSMove());
             MoveOriginCommand = new RelayComand<object>(_ => MoveOrigin());
-            PlusLimitCommand = new RelayComand<object>(_ => PlusLimit());
-            MinusLimitCommand = new RelayComand<object>(_ => MinusLimit());
+            PlusLimitCommand = new RelayComand<object>(_ => LimitMove(1));
+            MinusLimitCommand = new RelayComand<object>(_ => LimitMove(0));
         
             ResetAlarmCommand = new RelayComand<object>(_ => ResetAlarm());
             StopMoveCommand = new RelayComand<object>(_ => StopMove());
@@ -202,8 +158,52 @@ namespace IO_Application.ViewModel
         }
       
         #region ServoFun
+        private void StartReshUI()
+        {
+            _cts = new CancellationTokenSource();
+            _UIRefreshTask = RefreshUITask(_cts.Token);
+
+        }
+        private async  Task RefreshUITask(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                await RefreshUI();
+                await Task.Delay(200, token);
+            
+            }
+
+        }
+        private async Task RefreshUI()
+        {
+
+            try
+            {
+                LoadAxisStatus();
+                int cmdRs = EziMOTIONPlusELib.FAS_GetCommandPos(CurrentPort.IBdId, ref cmdPostion);
+                if (cmdRs == 0)
+                {
+                    CmdPos = cmdPostion;
+
+                }
+                int actRs = EziMOTIONPlusELib.FAS_GetActualPos(CurrentPort.IBdId, ref actualPosition);
+                if (actRs == 0)
+                {
+                    ActualPos = actualPosition;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Lỗi khi lấy dữ liệu position");
+            }
+
+
+
+
+        }
+
         public void Close() {
-            pooling.Stop();
+         
             CLoseAction.Invoke();
         }
         public void StopMove()
@@ -220,17 +220,13 @@ namespace IO_Application.ViewModel
 
         }
 
-        public void Move(int direction)
+        public async Task Move(int direction)
         {
             try
             {
                 uint speed = (uint)Speed;
                 int cmdPos = (int)SingleMoveCmdPos;
-                int rs = EziMOTIONPlusELib.FAS_MoveSingleAxisIncPos(CurrentPort.IBdId, direction * cmdPos, speed);
-                if (rs != 0)
-                {
-                    CommandStatus = "Lỗi di chuyển Dec/Inc";
-                }
+                await _motionService.ServoMove(CurrentPort.IBdId, direction * cmdPos, speed);
 
             }
             catch
@@ -246,125 +242,74 @@ namespace IO_Application.ViewModel
             try
             {
                 uint speed = (uint)Speed;
-                int cmdPos = CmdPos;
+                int cmdPos = SingleMoveCmdPos;
                 int rs = EziMOTIONPlusELib.FAS_MoveSingleAxisAbsPos(CurrentPort.IBdId, cmdPos, speed);
               
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                //MessageBox.Show("Lỗi ngoại lệ gửi lệnh ABS Move");
-                CommandStatus = ex.Message;
+                throw;
             }
 
         }
-        public void LimitMove(int direction)
+        public async Task LimitMove(int direction)
         {
             uint speed = (uint)MaxSpeed;
             try
             {
-                int rs = EziMOTIONPlusELib.FAS_MoveVelocity(CurrentPort.IBdId, speed, direction);
-                if (rs != EziMOTIONPlusELib.FMM_OK)
-                {
-                    CommandStatus = "Lỗi di chuyển Limit";
-                }
+                await _motionService.LimitMove(CurrentPort.IBdId,speed,direction);
+             
 
             }
-            catch
+            catch(Exception)
             {
-                MessageBox.Show("Lỗi ngoại lệ gửi lệnh Plus Limit");
+                throw;
             }
 
         }
-        public void ResetAlarm()
+        public async Task ResetAlarm()
         {
             try
             {
-                int rs = EziMOTIONPlusELib.FAS_ServoAlarmReset(CurrentPort.IBdId);
+                await _motionService.ResetAlarm(CurrentPort.IBdId);
+            }
+            catch(Exception ) 
+            {
+                throw;
+            }
+
+        }
+
+       
+        public async Task StartJogMove(int direction)
+        {
+            uint speed = (uint)MaxSpeed;
+            try
+            {
+                await _motionService.JogMove(CurrentPort.IBdId, speed, direction);
               
             }
-            catch
+            catch( Exception )
             {
-                MessageBox.Show("Lỗi ngoại lệ gửi lệnh Reset Alarm");
+                throw;
             }
-
-        }
-
-        public void PlusLimit() => LimitMove(1);
-        public void MinusLimit() => LimitMove(0);
-        public void StartJogMove(int direction)
-        {
-            uint speed = (uint)MaxSpeed;
             
-            EziMOTIONPlusELib.FAS_MoveVelocity(CurrentPort.IBdId, speed, direction);
 
         }
 
-        public void StopJog()
+
+
+        private async Task EnableServo(int status)
         {
             try
             {
-                int rs = EziMOTIONPlusELib.FAS_MoveStop(CurrentPort.IBdId);
-                if (rs == EziMOTIONPlusELib.FMM_OK)
-                {
-                    IsJogging = false;
-                   
-                }
-               
+                await _motionService.EnableServo(CurrentPort.IBdId, status);
             }
-            catch
-            {
-                MessageBox.Show("Lỗi ngoại lệ gửi lệnh Stop Jog");
-            }
-        }
-
-        private void ServoOff()
-        {
-            try
-            {
-                MessageBox.Show("Servo" + " " + CurrentPort.IBdId + " OFF");
-                int rs = EziMOTIONPlusELib.FAS_ServoEnable(CurrentPort.IBdId, 0);
-                if (rs == EziMOTIONPlusELib.FMM_OK)
-                {
-                    IsServoOn = false;
-                    ServoStatus = "OFF";
-                }
-                else
-                {
-                    ServoStatus = "Error servo OFF";
-                }
-
-            }
-            catch
-            {
-                MessageBox.Show("Lỗi ngoại lệ tắt Servo ");
-            }
-
-
-        }
-        private void ServoOn()
-        {
-            MessageBox.Show("Servo" + " " + CurrentPort.IBdId + " ON");
-
-            try
+            catch (Exception)
             {
 
-                int rs = EziMOTIONPlusELib.FAS_ServoEnable(CurrentPort.IBdId, 1);
-                if (rs == EziMOTIONPlusELib.FMM_OK)
-                {
-                    IsServoOn = true;
-                    ServoStatus = "ON";
-                }
-                else
-                {
-                    ServoStatus = "Error servo ON";
-                }
+                throw;
             }
-            catch
-            {
-                MessageBox.Show("Lỗi ngoại lệ bật Servo");
-            }
-          
-
         }
 
         public void SingleMove()
@@ -375,11 +320,7 @@ namespace IO_Application.ViewModel
             {
 
                 int rs = EziMOTIONPlusELib.FAS_MoveSingleAxisAbsPos(CurrentPort.IBdId, cmdPos, speed);
-                if(rs! == EziMOTIONPlusELib.FMM_OK)
-                {
-                    CommandStatus = "Lỗi di chuyển ABS";
-                }
-              
+                           
             }
             catch
             {
@@ -392,10 +333,7 @@ namespace IO_Application.ViewModel
             {
 
                 int rs = EziMOTIONPlusELib.FAS_MoveOriginSingleAxis(CurrentPort.IBdId);
-                if (rs != EziMOTIONPlusELib.FMM_OK)
-                {
-                    CommandStatus = "Lỗi di chuyển Origin";
-                }
+               
             }
             catch
             {
@@ -406,44 +344,6 @@ namespace IO_Application.ViewModel
         int actualPosition = 0;
 
 
-        private void LoadUIData()
-        {
-            DataStatus = "";
-            try
-            {
-                LoadAxisStatus();
-                int cmdRs = EziMOTIONPlusELib.FAS_GetCommandPos(CurrentPort.IBdId, ref cmdPostion);
-                if (cmdRs == 0)
-                {
-                    CmdPos = cmdPostion;
-
-                }
-                else
-                {
-                    DataStatus += "Lỗi lấy cmdPos";
-                }
-                int actRs = EziMOTIONPlusELib.FAS_GetActualPos(CurrentPort.IBdId, ref actualPosition);
-                if (actRs == 0)
-                {
-                    ActualPos = actualPosition;
-                }
-                else
-                {
-                    DataStatus += "Lỗi lấy currentPos";
-
-                }
-
-
-            }
-            catch
-            {
-                MessageBox.Show("Lỗi khi lấy dữ liệu position");
-            }
-
-
-
-
-        }
         uint axisStatus;
         public void LoadAxisStatus()
         {
@@ -456,9 +356,9 @@ namespace IO_Application.ViewModel
                     }
                 }
             }
-            catch
+            catch(Exception) 
             {
-                DataStatus = "Get AxisStatus Error";
+                throw;
             }
         }
         #endregion

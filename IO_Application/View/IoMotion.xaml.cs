@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static IO_Application.ViewModel.DispatcherPollingService;
 
 namespace IO_Application.View
 {

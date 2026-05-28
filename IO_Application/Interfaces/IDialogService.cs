@@ -4,9 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IO_Application.ViewModel
+namespace IO_Application.Interfaces
 {
-    internal class MainViewModel
+    public interface IDialogService
     {
+        //Loading
+
+        //Messagebox
+
+
+
     }
 }

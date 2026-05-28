@@ -34,14 +34,6 @@ namespace IO_Application.View
             ServoMotionVM.CLoseAction = () => this.Close();
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
 
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }
