@@ -73,9 +73,7 @@
         <Setter Property="HorizontalAlignment" Value="Right"/>
       
         <Style.Triggers>
-           
-           
-           
+                      
             <DataTrigger Binding="{Binding Status}" Value="true">
                 <Setter Property="Background" Value="Red"/>
             </DataTrigger>

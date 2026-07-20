@@ -21,7 +21,7 @@ namespace IO_Application.ViewModel
     public class ServoMotionViewModel : BaseViewModel
     {
         #region Parameter
-        private MotionService _motionService;
+        private MotionService _motionService = new();
         private CancellationTokenSource _cts=new();
         private Task? _UIRefreshTask;
         public Action CLoseAction { get; set; }
@@ -35,7 +35,7 @@ namespace IO_Application.ViewModel
          "Z Pulse","Omg Ret OK","Motion DIR","Motioning","Motion Pause",
          "Motion Accel","Motion Decel","Motion Const"
         };
-        private PortModel _currentPort;
+        private PortModel _currentPort = new();
         public PortModel CurrentPort
         {
             get { return _currentPort; }
@@ -142,18 +142,18 @@ namespace IO_Application.ViewModel
             StartReshUI();
             ServoOffCommand = new RelayComand<object>(async _ =>await EnableServo(0));
             ServoOnCommand = new RelayComand<object>(async _ => await EnableServo(1));
-            PlusJogCommand = new RelayComand<object>(_ => StartJogMove(1));
-            MinusJogCommand = new RelayComand<object>(_ => StartJogMove(0));
+            PlusJogCommand = new RelayComand<object>(async _ =>await StartJogMove(1));
+            MinusJogCommand = new RelayComand<object>(async _ => await StartJogMove(0));
             JogStopCommand = new RelayComand<object>(_ => StopMove());
             ABSMoveCommand = new RelayComand<object>(_ => ABSMove());
             MoveOriginCommand = new RelayComand<object>(_ => MoveOrigin());
-            PlusLimitCommand = new RelayComand<object>(_ => LimitMove(1));
-            MinusLimitCommand = new RelayComand<object>(_ => LimitMove(0));
+            PlusLimitCommand = new RelayComand<object>(async _ =>await LimitMove(1));
+            MinusLimitCommand = new RelayComand<object>(async _ => await LimitMove(0));
         
-            ResetAlarmCommand = new RelayComand<object>(_ => ResetAlarm());
+            ResetAlarmCommand = new RelayComand<object>(async _ =>await ResetAlarm());
             StopMoveCommand = new RelayComand<object>(_ => StopMove());
-            IncMoveCommand = new RelayComand<object>(_ => IncMove());
-            DecMoveCommand = new RelayComand<object>(_ => DecMove());
+            IncMoveCommand = new RelayComand<object>(async _ =>await IncMove());
+            DecMoveCommand = new RelayComand<object>(async _ =>await DecMove());
             CloseCommand = new RelayComand<object>(_ => Close());
         }
       
@@ -176,7 +176,6 @@ namespace IO_Application.ViewModel
         }
         private async Task RefreshUI()
         {
-
             try
             {
                 LoadAxisStatus();
@@ -195,11 +194,7 @@ namespace IO_Application.ViewModel
             catch
             {
                 MessageBox.Show("Lỗi khi lấy dữ liệu position");
-            }
-
-
-
-
+            }   
         }
 
         public void Close() {
@@ -235,8 +230,8 @@ namespace IO_Application.ViewModel
             }
 
         }
-        public void IncMove() => Move(1);
-        public void DecMove() => Move(-1);
+        public async Task IncMove() =>await Move(1);
+        public async Task DecMove() =>await Move(-1);
         public void ABSMove()
         {
             try

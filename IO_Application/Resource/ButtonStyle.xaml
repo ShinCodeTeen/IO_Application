@@ -300,6 +300,14 @@
 
             </Setter.Value>
         </Setter>
-
+    
     </Style>
+	<Style x:Key="NoitifyButton" TargetType="Button">
+		<Setter Property="Margin" Value="10"/>
+		<Setter Property="FontSize" Value="17"/>
+		<Setter Property="Padding" Value="10 5"/>
+		<Setter Property="HorizontalAlignment" Value="Right"/>
+		<Setter Property="VerticalAlignment" Value="Bottom"/>
+		
+	</Style>
 </ResourceDictionary>

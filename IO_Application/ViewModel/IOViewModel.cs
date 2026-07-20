@@ -83,7 +83,7 @@ namespace IO_Application.ViewModel
                     CurrentPortModel = IoPorts[currrentIndex + 1];
                 }
             }
-            uint direction;
+           
             public void InitPin()
             {
                 for (int pinNumber = 0; pinNumber < 32; pinNumber++)
